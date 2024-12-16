@@ -59,7 +59,7 @@ label_mapping = {
 df_t.drop(columns=['ID', 'VEHICLE_TYPE'], inplace=True)
 print("Dropped unnecessary columns: ID, VEHICLE_TYPE.")
 
-# --- Handle Missing Data ---
+# --- creating correlation for before and after the cleaning ---
 corrs['corr_mileage_claims']=correlation_analysis(numeric_train,'ANNUAL_MILEAGE','CLAIMS_INSURANCE_NEXT_YEAR')
 corrs['corr_children_claims']=correlation_analysis(numeric_train,'CHILDREN','CLAIMS_INSURANCE_NEXT_YEAR')
 corrs['corr_married_claims']=correlation_analysis(numeric_train,'MARRIED','CLAIMS_INSURANCE_NEXT_YEAR')
@@ -69,6 +69,7 @@ corrs['corr_credit_claims']=correlation_analysis(numeric_train,'CREDIT_SCORE','C
 corrs['corr_speeding_claims']=correlation_analysis(numeric_train,'SPEEDING_VIOLATIONS','CLAIMS_INSURANCE_NEXT_YEAR')
 
 # --- Identify and Remove Illogical Rows ---
+print(f'Amount of illogical rows with age and driving experience',{len(numeric_train[numeric_train['AGE'] - numeric_train['DRIVING_EXPERIENCE'] < 16])})
 # Rows with illogical values and missing critical data
 illogical_rows = df_t[
     (df_t['AGE'] - df_t['DRIVING_EXPERIENCE'] < 16) &
@@ -234,7 +235,15 @@ plt.ylabel('Frequency')
 plt.tight_layout()
 plt.savefig('speeding_violations_distribution.png', dpi=300, bbox_inches='tight')
 plt.show()
-
+# Histogram for SPEEDING_VIOLATIONS before transformation
+plt.figure(figsize=(10, 6))
+sns.histplot(numeric_train['SPEEDING_VIOLATIONS'], kde=True, color='purple', bins=22, edgecolor='black')
+plt.title('Distribution of Speeding Violations (After Transformation)')
+plt.xlabel(label_mapping['SPEEDING_VIOLATIONS'])
+plt.ylabel('Frequency')
+plt.tight_layout()
+plt.savefig('speeding_violations_distribution_before.png', dpi=300, bbox_inches='tight')
+plt.show()
 
 # Calculate Spearman correlation for the cleaned DataFrame
 spearman_corr_table_cleaned = df_t_renamed.corr(method='spearman')
