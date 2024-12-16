@@ -57,7 +57,9 @@ label_mapping = {
 # --- Remove Unnecessary Features ---
 
 df_t.drop(columns=['ID', 'VEHICLE_TYPE'], inplace=True)
+print("Dropped unnecessary columns: ID, VEHICLE_TYPE.")
 
+# --- Handle Missing Data ---
 corrs['corr_mileage_claims']=correlation_analysis(numeric_train,'ANNUAL_MILEAGE','CLAIMS_INSURANCE_NEXT_YEAR')
 corrs['corr_children_claims']=correlation_analysis(numeric_train,'CHILDREN','CLAIMS_INSURANCE_NEXT_YEAR')
 corrs['corr_married_claims']=correlation_analysis(numeric_train,'MARRIED','CLAIMS_INSURANCE_NEXT_YEAR')
@@ -65,10 +67,6 @@ corrs['corr_driving_experience_claims']=correlation_analysis(numeric_train,'DRIV
 corrs['corr_age_claims']=correlation_analysis(numeric_train,'AGE','CLAIMS_INSURANCE_NEXT_YEAR')
 corrs['corr_credit_claims']=correlation_analysis(numeric_train,'CREDIT_SCORE','CLAIMS_INSURANCE_NEXT_YEAR')
 corrs['corr_speeding_claims']=correlation_analysis(numeric_train,'SPEEDING_VIOLATIONS','CLAIMS_INSURANCE_NEXT_YEAR')
-
-
-
-
 
 # --- Identify and Remove Illogical Rows ---
 # Rows with illogical values and missing critical data
