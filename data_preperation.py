@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from nltk.sem.logic import is_funcvar
 from numpy.ma.core import not_equal
 from pandas.core.interchange.dataframe_protocol import DataFrame
-from pyasn1_modules.rfc6031 import id_pskc_friendlyName
+#from pyasn1_modules.rfc6031 import id_pskc_friendlyName
 
 from sklearn.impute import KNNImputer
 from sklearn.linear_model import LinearRegression
@@ -113,6 +113,7 @@ df_t.loc[missing_annual_mileage, 'ANNUAL_MILEAGE'] = y_pred
 print("Missing ANNUAL_MILEAGE values imputed using Linear Regression.")
 corrs['corr_mileage_claims'].add_after_cleaning(df_t)
 
+df_t['SPEEDING_VIOLATIONS_Copy']= df_t['SPEEDING_VIOLATIONS'].copy()
 df_t['SPEEDING_VIOLATIONS'] = pd.cut(df_t['SPEEDING_VIOLATIONS'], bins=[0, 1, 3,5,  float('inf')], labels=[0, 1, 2, 3], right=False)
 print("Binned SPEEDING_VIOLATIONS into categories.")
 corrs['corr_speeding_claims'].add_after_cleaning(df_t)
@@ -235,6 +236,7 @@ plt.ylabel('Frequency')
 plt.tight_layout()
 plt.savefig('speeding_violations_distribution.png', dpi=300, bbox_inches='tight')
 plt.show()
+
 # Histogram for SPEEDING_VIOLATIONS before transformation
 plt.figure(figsize=(10, 6))
 sns.histplot(numeric_train['SPEEDING_VIOLATIONS'], kde=True, color='purple', bins=22, edgecolor='black')
@@ -245,6 +247,39 @@ plt.tight_layout()
 plt.savefig('speeding_violations_distribution_before.png', dpi=300, bbox_inches='tight')
 plt.show()
 
+"""
+"""
+# Ensure SPEEDING_VIOLATIONS_CATEGORY is created with right categories
+df_t['SPEEDING_VIOLATIONS_CATEGORY'] = pd.cut(
+    df_t['SPEEDING_VIOLATIONS_Copy'],
+    bins=[-float('inf'), 0, 2, 4, float('inf')],
+    labels=["No Violations", "Few Violations", "Multiple Violations", "High Number of Violations"],
+    right=True
+)
+
+# Plotting the histogram for SPEEDING_VIOLATIONS_CATEGORY with counts and percentages
+plt.figure(figsize=(10, 6))
+ax = sns.countplot(
+    x=df_t['SPEEDING_VIOLATIONS_CATEGORY'],
+    palette='viridis',
+    edgecolor='black'
+)
+# Adding counts and percentages above the bars
+total = len(df_t)
+for p in ax.patches:
+    count = int(p.get_height())
+    percentage = f"{(count / total) * 100:.1f}%"
+    ax.annotate(f'{count}\n({percentage})', (p.get_x() + p.get_width() / 2., p.get_height()),
+                ha='center', va='bottom', fontsize=10)
+plt.title('Distribution of Speeding Violations Categories (After Transformation)', fontsize=14)
+plt.xlabel('Speeding Violations Category', fontsize=12)
+plt.ylabel('Frequency', fontsize=12)
+plt.xticks(rotation=15)
+plt.tight_layout()
+plt.savefig('speeding_violations_distribution_after.png', dpi=300, bbox_inches='tight')
+plt.show()
+"""
+"""
 # Calculate Spearman correlation for the cleaned DataFrame
 spearman_corr_table_cleaned = df_t_renamed.corr(method='spearman')
 
@@ -255,4 +290,27 @@ plt.title('Spearman Rank Correlation Matrix (After Cleaning)')
 plt.tight_layout()
 plt.savefig('spearman_correlation_matrix_after_cleaning.png', dpi=300, bbox_inches='tight')
 plt.show()
+
+
+## Pearson correlation: continuous variables
+
+non_categorial_columns = [
+    'CREDIT_SCORE', 'ANNUAL_MILEAGE',
+    'PAST_ACCIDENTS', 'NORM_AGE_EXP_MEAN']
+
+# Update column names based on label_mapping and get olny non-categorial columns
+correlation_columns_mapped = [label_mapping[col] for col in non_categorial_columns]
+df_t_renamed_filtered = df_t_renamed[correlation_columns_mapped]
+
+# Calculate Pearson correlation for the cleaned DataFrame
+pearson_corr_table_cleaned = df_t_renamed_filtered.corr(method='pearson')
+
+# Plot the Pearson correlation heatmap
+plt.figure(figsize=(14, 10))
+sns.heatmap(pearson_corr_table_cleaned, annot=True, fmt='.2f', cmap='coolwarm', vmin=-1, vmax=1)
+plt.title('Pearson Correlation Matrix (Filtered Columns)')
+plt.tight_layout()
+plt.savefig('pearson_correlation_matrix_filtered_columns.png', dpi=300, bbox_inches='tight')
+plt.show()
+
 
