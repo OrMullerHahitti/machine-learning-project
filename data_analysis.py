@@ -277,7 +277,7 @@ numeric_train.loc[~numeric_train['CLAIMS_INSURANCE_NEXT_YEAR'].isin([0, 1]), 'CL
 
 # Pearson correlation: continuous variables
 continuous_columns = [
-    'ID', 'CREDIT_SCORE', 'POSTAL_CODE', 'ANNUAL_MILEAGE',
+    'ID', 'CREDIT_SCORE', 'ANNUAL_MILEAGE',
     'SPEEDING_VIOLATIONS', 'PAST_ACCIDENTS', 'AGE', 'DRIVING_EXPERIENCE'
 ]
 
@@ -468,10 +468,10 @@ plt.show()
 
 # 5. Box plot for POSTAL_CODE vs CLAIMS_INSURANCE_NEXT_YEAR
 plt.figure(figsize=(8, 6))
-sn.boxplot(x='CLAIMS_INSURANCE_NEXT_YEAR', y='POSTAL_CODE', data=train, palette='pastel')
+sn.countplot(x='POSTAL_CODE', hue='CLAIMS_INSURANCE_NEXT_YEAR', data=train, palette='pastel')
 plt.title('Relationship Between POSTAL_CODE and CLAIMS_INSURANCE_NEXT_YEAR')
-plt.xlabel('Claims Insurance Next Year')
-plt.ylabel('Postal Code')
+plt.xlabel('Postal Code')
+plt.ylabel('Count')
 plt.tight_layout()
 plt.savefig('postal_code_vs_claims.png', dpi=300, bbox_inches='tight')
 plt.show()
