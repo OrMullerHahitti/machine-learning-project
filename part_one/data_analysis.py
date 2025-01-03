@@ -15,7 +15,7 @@ root.withdraw()
 
 #train=pd.read_csv(filePath, encoding='latin1')
 
-train=pd.read_csv("XY_train.csv", encoding='latin1')
+train=pd.read_csv("../XY_train.csv", encoding='latin1')
 
 # Renaming the column OUTCOME to CLAIMS_INSURANCE_NEXT_YEAR
 train.rename(columns={'OUTCOME': 'CLAIMS_INSURANCE_NEXT_YEAR'}, inplace=True)

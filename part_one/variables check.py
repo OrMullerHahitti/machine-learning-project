@@ -6,13 +6,13 @@ from scipy.stats import spearmanr, pearsonr, chi2_contingency, pointbiserialr
 from tkinter import Tk, filedialog
 
 
-train=pd.read_csv("XY_train.csv", encoding='latin1')
+train=pd.read_csv("../XY_train.csv", encoding='latin1')
 
 # Renaming the column OUTCOME to CLAIMS_INSURANCE_NEXT_YEAR
 train.rename(columns={'OUTCOME': 'CLAIMS_INSURANCE_NEXT_YEAR'}, inplace=True)
 
 
-test=pd.read_csv("X_test.csv", encoding='latin1')
+test=pd.read_csv("../X_test.csv", encoding='latin1')
 
 test.rename(columns={'OUTCOME': 'CLAIMS_INSURANCE_NEXT_YEAR'}, inplace=True)
 

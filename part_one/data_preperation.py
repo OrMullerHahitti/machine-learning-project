@@ -12,7 +12,7 @@ from sklearn.feature_selection import mutual_info_regression
 from scipy.stats import zscore
 
 # Import custom modules
-from data_analysis import numeric_train
+from part_one.data_analysis import numeric_train
 # Copy the numeric training data
 corrs = {}
 class correlation_analysis:
