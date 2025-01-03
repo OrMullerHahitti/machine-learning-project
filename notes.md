@@ -5,4 +5,6 @@
 - [seaborn](https://seaborn.pydata.org/)
 
 - [tensorflow](https://www.tensorflow.org/)
-- - [scikit-learn](https://scikit-learn.org/stable/)
+- [scikit-learn](https://scikit-learn.org/stable/)
+- - [keras](https://keras.io/)
+- -
