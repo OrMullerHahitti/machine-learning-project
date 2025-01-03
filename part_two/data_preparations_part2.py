@@ -80,6 +80,6 @@ def normalize_dataset(dataset, columns, method='minmax'):
 
     return normalized_data
 
-
-df_check=prepare_data(dummies=True)
-print(df_check[0].head())
+if __name__ == '__main__':
+    df_check=prepare_data(dummies=True)
+    print(df_check[0].head())
