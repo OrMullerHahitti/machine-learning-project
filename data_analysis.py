@@ -277,7 +277,7 @@ numeric_train.loc[~numeric_train['CLAIMS_INSURANCE_NEXT_YEAR'].isin([0, 1]), 'CL
 
 # Pearson correlation: continuous variables
 continuous_columns = [
-    'ID', 'CREDIT_SCORE', 'POSTAL_CODE', 'ANNUAL_MILEAGE',
+    'ID', 'CREDIT_SCORE', 'ANNUAL_MILEAGE',
     'SPEEDING_VIOLATIONS', 'PAST_ACCIDENTS', 'AGE', 'DRIVING_EXPERIENCE'
 ]
 
@@ -424,3 +424,64 @@ plt.tight_layout()
 plt.show()
 
 ####################################################################################################################
+#visualizes relationships between some variables and CLAIMS_INSURANCE_NEXT_YEAR (Target Variable)
+
+# 1. Count plot for SPEEDING_VIOLATIONS vs CLAIMS_INSURANCE_NEXT_YEAR
+plt.figure(figsize=(8, 6))
+sn.boxplot(x='CLAIMS_INSURANCE_NEXT_YEAR', y='SPEEDING_VIOLATIONS', data=train, palette='pastel')
+plt.title('Relationship Between SPEEDING_VIOLATIONS and CLAIMS_INSURANCE_NEXT_YEAR')
+plt.xlabel('Claims Insurance Next Year')
+plt.ylabel('Speeding Violations')
+plt.tight_layout()
+plt.savefig('speeding_violations_vs_claims.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# 2. Box plot for AGE vs CLAIMS_INSURANCE_NEXT_YEAR
+plt.figure(figsize=(8, 6))
+sn.boxplot(x='CLAIMS_INSURANCE_NEXT_YEAR', y='AGE', data=train, palette='pastel')
+plt.title('Relationship Between AGE and CLAIMS_INSURANCE_NEXT_YEAR')
+plt.xlabel('Claims Insurance Next Year')
+plt.ylabel('Age')
+plt.tight_layout()
+plt.savefig('age_vs_claims.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# 3. Box plot for ANNUAL_MILEAGE vs CLAIMS_INSURANCE_NEXT_YEAR
+plt.figure(figsize=(8, 6))
+sn.boxplot(x='CLAIMS_INSURANCE_NEXT_YEAR', y='ANNUAL_MILEAGE', data=train, palette='pastel')
+plt.title('Relationship Between ANNUAL_MILEAGE and CLAIMS_INSURANCE_NEXT_YEAR')
+plt.xlabel('Claims Insurance Next Year')
+plt.ylabel('Annual Mileage')
+plt.tight_layout()
+plt.savefig('annual_mileage_vs_claims.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# 4. Box plot for ID vs CLAIMS_INSURANCE_NEXT_YEAR
+plt.figure(figsize=(8, 6))
+sn.boxplot(x='CLAIMS_INSURANCE_NEXT_YEAR', y='ID', data=train, palette='pastel')
+plt.title('Relationship Between ID and CLAIMS_INSURANCE_NEXT_YEAR')
+plt.xlabel('Claims Insurance Next Year')
+plt.ylabel('ID')
+plt.tight_layout()
+plt.savefig('id_vs_claims.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# 5. Box plot for POSTAL_CODE vs CLAIMS_INSURANCE_NEXT_YEAR
+plt.figure(figsize=(8, 6))
+sn.countplot(x='POSTAL_CODE', hue='CLAIMS_INSURANCE_NEXT_YEAR', data=train, palette='pastel')
+plt.title('Relationship Between POSTAL_CODE and CLAIMS_INSURANCE_NEXT_YEAR')
+plt.xlabel('Postal Code')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.savefig('postal_code_vs_claims.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+# 6. Count plot for GENDER vs CLAIMS_INSURANCE_NEXT_YEAR
+plt.figure(figsize=(8, 6))
+sn.countplot(x='GENDER', hue='CLAIMS_INSURANCE_NEXT_YEAR', data=train, palette='pastel')
+plt.title('Relationship Between GENDER and CLAIMS_INSURANCE_NEXT_YEAR')
+plt.xlabel('Gender')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.savefig('gender_vs_claims.png', dpi=300, bbox_inches='tight')
+plt.show()
