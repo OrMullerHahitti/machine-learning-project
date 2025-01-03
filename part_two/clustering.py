@@ -14,7 +14,7 @@ from data_preparations_part2 import prepare_data
 # Load data
 # --------------------------------------------------------------------
 
-X_train, y_train, x_test, y_test = prepare_data()
+X_train, y_train, x_test, y_test = prepare_data(dummies=True)
 # 1) Scale
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
