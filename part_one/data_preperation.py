@@ -151,6 +151,7 @@ df_t_renamed = df_t.rename(columns=label_mapping)
 ## 1. Distribution of CREDIT_SCORE before and after imputation
 plt.figure(figsize=(14, 6))
 
+
 # Before imputation
 plt.subplot(1, 2, 1)
 sns.histplot(numeric_train['CREDIT_SCORE'], kde=True, color='blue', bins=30, edgecolor='black')
@@ -313,4 +314,7 @@ plt.tight_layout()
 plt.savefig('pearson_correlation_matrix_filtered_columns.png', dpi=300, bbox_inches='tight')
 plt.show()
 
+
+
+df_t_renamed.to_csv('../prepared_data/cleaned_data_new.csv', index=False)
 
