@@ -10,6 +10,7 @@ from sklearn.metrics import silhouette_score, adjusted_rand_score
 
 from data_preparations_part2 import prepare_data
 
+
 # --------------------------------------------------------------------
 # Load data
 # --------------------------------------------------------------------

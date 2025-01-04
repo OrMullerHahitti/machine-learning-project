@@ -1,9 +1,16 @@
-from typing import Literal, List, Any, Iterable
+from typing import Literal, List, Any, Iterable, Final
 
 import pandas as pd
 from pandas.core.interchange.dataframe_protocol import DataFrame
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+
+#Categorial ordered/continuous cols not including the Binary variables
+categorical_ordered_continuous_cols:Final[Iterable[str]] = ['Credit Score', 'Normalized Age and Experience Mean', 'Annual Mileage',
+                                       'Past Accidents', 'Education', 'Income Category', 'Speeding Violations']
+# Categorical unordered columns for dummy encoding
+categorical_unordered_cols:Final[Iterable[str]] = ['Postal Code', 'Family Status']
 
 # Read the CSV file
 data = pd.read_csv('../prepared_data/cleaned_data_new.csv')
@@ -18,7 +25,7 @@ def cast_dataframe_to_int(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].astype('int')
     return df
 
-def get_dummies(df,unordered_cols:Iterable[str]=['Family Status','Postal Code']):
+def get_dummies(df,unordered_cols=categorical_unordered_cols):
     df_c=df.copy()
     encoded_data = pd.get_dummies(df_c, columns=unordered_cols)
     df_c.drop(labels=unordered_cols, axis=1, inplace=True)
