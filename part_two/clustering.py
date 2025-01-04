@@ -2,11 +2,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns  # for heatmap
+from sklearn.model_selection import GridSearchCV
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, adjusted_rand_score
+from sklearn.metrics import silhouette_score, adjusted_rand_score, f1_score
 
 from data_preparations_part2 import prepare_data
 
@@ -32,18 +33,34 @@ feature_names = X_train.columns
 # --------------------------------------------------------------------
 abs_loadings_pc1 = np.abs(pca.components_[0])
 abs_loadings_pc2 = np.abs(pca.components_[1])
-
+print(f'list of all the self values for pc1{abs_loadings_pc1}')
+print(f'list of all the self values for pc2 {abs_loadings_pc2}')
 # Indices of the features with the largest absolute weight
 top_idx_pc1 = np.argmax(abs_loadings_pc1)
 top_idx_pc2 = np.argmax(abs_loadings_pc2)
 
-# Corresponding feature names
+#----------------------------------------------
+# Create a DataFrame with the feature names and loadings
+#----------------------------------------------
+feature_list = list(zip(feature_names, abs_loadings_pc1, abs_loadings_pc2))
+
+# Create a DataFrame from the feature list
+df_features = pd.DataFrame(feature_list, columns=['Feature', 'PC1 Loading', 'PC2 Loading'])
+
+# Calculate the average of PC1 and PC2 loadings
+df_features['Average Loading'] = df_features[['PC1 Loading', 'PC2 Loading']].mean(axis=1)
+
+# Sort the DataFrame by the average loading
+df_features_sorted = df_features.sort_values(by='Average Loading', ascending=False).drop_duplicates(subset='Feature')
+
+# Print the sorted DataFrame as a table
+print(df_features_sorted.to_string(index=False))
 top_feature_pc1 = feature_names[top_idx_pc1]
 top_feature_pc2 = feature_names[top_idx_pc2]
 
 # Create descriptive axis labels
-label_pc1 = f"{top_feature_pc1} (PC1)"
-label_pc2 = f"{top_feature_pc2} (PC2)"
+label_pc1 = f" most dominant feature in (PC1) - {top_feature_pc1} "
+label_pc2 = f" most dominant feature in (PC2) - {top_feature_pc2} "
 
 # --------------------------------------------------------------------
 # KMeans (2 Clusters)
@@ -54,12 +71,14 @@ clusters = kmeans.fit_predict(X_train_pca)
 # Evaluate
 sil = silhouette_score(X_train_pca, clusters)
 ari = adjusted_rand_score(y_train, clusters)
+f_1 = f1_score(y_train, clusters)
 
 print(f"Silhouette Score: {sil:.3f}")
 print(f"Adjusted Rand Index: {ari:.3f}")
+print(f"F1 Score: {f_1:.3f}")
 
 # --------------------------------------------------------------------
-# Plot 1: Clusters and True Labels in PCA Space
+# Plot 1: Cluster Assignments vs. True Labels
 # --------------------------------------------------------------------
 plt.figure(figsize=(12, 5))
 
