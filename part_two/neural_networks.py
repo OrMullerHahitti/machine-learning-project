@@ -1,7 +1,9 @@
 from data_preparations_part2 import data, prepare_data, normalize_dataset
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report, f1_score
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, RandomizedSearchCV
+import itertools
+
 
 
 # Define columns for processing
@@ -53,6 +55,7 @@ f1_train_standard = f1_score(y_train, y_pred_train_standard)
 f1_test_standard = f1_score(y_test, y_pred_test_standard)
 #----------------------------------------------------------------------------------------------------------------------
 
+
 # Print results for both normalization methods
 print("Comparison of Normalization Methods:")
 print("Min-Max Normalization:")
@@ -68,69 +71,144 @@ if f1_test_minmax > f1_test_standard:
 else:
     print("Standard Normalization performs better based on F1 Testing Score.")
 
+hidden_layer_sizes = model.hidden_layer_sizes  # Number of neurons in each hidden layer
+activation_function = model.activation         # Activation function used
 
+# Number of neurons in the input layer
+num_input_neurons = X_train.shape[1]  # X_train is your training data
+print(f"Number of neurons in the input layer: {num_input_neurons}")
+# Displaying the results
+print(f"Number of hidden layers: {len(hidden_layer_sizes)}")
+print(f"Number of neurons in each hidden layer: {hidden_layer_sizes}")
+print(f"Activation function: {activation_function}")
 
+#----------------------------------------------------------------------------------------------------------------------
 """
-Hyperparameter Tuning:
-This section uses GridSearchCV with 3-fold cross-validation to tune key hyperparameters 
-of MLPClassifier:
-    hidden_layer_sizes: Defines the architecture of the neural network.
-    activation: Specifies the activation function for the hidden layers (relu or tanh).
-    solver: Determines the optimization algorithm (adam or sgd).
-    alpha: Sets the L2 regularization parameter.
-    learning_rate: Controls the learning rate schedule.
-It evaluates the model on both Min-Max and Standard normalization, optimizing for F1 score
-to handle class imbalance effectively. Final results include the best parameters and performance on the test set.
+Hyperparameter Tuning with RandomizedSearchCV:
+RandomizedSearchCV with 5-fold StratifiedKFold cross-validation tunes MLPClassifier hyperparameters:
+    - hidden_layer_sizes: 1-3 layers, 30-50 neurons per layer (step 10), order matters.
+    - alpha: L2 regularization (0.0001).
+    - learning_rate: Constant.
+    - max_iter: 100, 200.
+Evaluates 20 random combinations on Min-Max normalized data, reporting:
+    - Best hyperparameters.
+    - F1 scores on train and test sets.
 """
-"""
+
+# Parameters
+layer_size = range(1, 4)  # Number of hidden layers
+neuron_Amount = range(30, 51, 10)  # Number of neurons per layer
+
+# Generate combinations where order matters
+hidden_layer_combinations = []
+for i in layer_size:
+    combinations = list(itertools.product(neuron_Amount, repeat=i))
+    hidden_layer_combinations.extend(combinations)
+
+# Check results
+print(hidden_layer_combinations)
+
 
 # Hyperparameter tuning with GridSearchCV
 param_grid = {
-    'hidden_layer_sizes': [(50,), (100,)],
-    'activation': ['relu'],
-    'solver': ['adam'],
+    'hidden_layer_sizes': hidden_layer_combinations,
+    'max_iter': [100, 200],
     'alpha': [0.0001],
-    'learning_rate': ['constant'],
+    'learning_rate': ['constant']
 }
 
 # Use StratifiedKFold for cross-validation
-cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 # Initialize GridSearchCV
-grid_search = GridSearchCV(
-    MLPClassifier(random_state=42, max_iter=300),
+random_search = RandomizedSearchCV(
+    MLPClassifier(random_state=100),
     param_grid,
     scoring='f1',
     cv=cv,
-    verbose=1
+    verbose=3,  # Verbose level for detailed progress
+    n_iter=20,
+    random_state=42
 )
 
 # Fit the model with Min-Max normalized data
-grid_search.fit(X_train_minmax, y_train)
+random_search.fit(X_train_minmax, y_train)
 
 # Best parameters and score
-print("Best parameters (Min-Max):", grid_search.best_params_)
-print("Best F1 score (Min-Max):", grid_search.best_score_)
+print("Best parameters:", random_search.best_params_)
+print("Best F1 score:", random_search.best_score_)
+
+# Evaluate on the train set
+best_model = random_search.best_estimator_
+y_pred_train = best_model.predict(X_train_minmax)
+f1_train = f1_score(y_train, y_pred_train)
+print("Train F1 Score:", f1_train)
 
 # Evaluate on the test set
-best_model = grid_search.best_estimator_
 y_pred_test = best_model.predict(X_test_minmax)
-accuracy_test = accuracy_score(y_test, y_pred_test)
 f1_test = f1_score(y_test, y_pred_test)
-print("Test Accuracy (Min-Max):", accuracy_test)
-print("Test F1 Score (Min-Max):", f1_test)
+print("Test F1 Score:", f1_test)
 
-# Fit the model with Standard normalized data
-grid_search.fit(X_train_standard, y_train)
 
-# Best parameters and score for Standard
-print("Best parameters (Standard):", grid_search.best_params_)
-print("Best F1 score (Standard):", grid_search.best_score_)
-
-# Evaluate on the test set
-y_pred_test_standard = grid_search.best_estimator_.predict(X_test_standard)
-accuracy_test_standard = accuracy_score(y_test, y_pred_test_standard)
-f1_test_standard = f1_score(y_test, y_pred_test_standard)
-print("Test Accuracy (Standard):", accuracy_test_standard)
-print("Test F1 Score (Standard):", f1_test_standard)
+#----------------------------------------------------------------------------------------------------------------------
 """
+This next section visualizes the results to analyze the impact of hyperparameters:
+- A scatter plot shows F1 scores against hidden layer configurations.
+- Normalized distributions compare F1 scores for two values of max_iter (100 and 200).
+Results are saved to a CSV file for further analysis.
+"""
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+import numpy as np
+
+# Collect results from RandomizedSearchCV
+results_df = pd.DataFrame(random_search.cv_results_)
+
+# Save the results as a CSV file
+results_csv_path = "hyperparameter_tuning_results.csv"
+results_df.to_csv(results_csv_path, index=False)
+print(f"Hyperparameter tuning results saved to: {results_csv_path}")
+
+# Visualize the results
+
+# Graph 1: Mean test F1 score vs. hidden layer sizes
+plt.figure(figsize=(12, 8))
+plt.scatter(
+    results_df["param_hidden_layer_sizes"].astype(str),
+    results_df["mean_test_score"],
+    alpha=0.7,
+    color='red'  # Set points to red
+)
+plt.xticks(rotation=90, color='black')
+plt.title("F1 Score vs Hidden Layer Configurations", color='black')
+plt.xlabel("Hidden Layer Sizes", color='black')
+plt.ylabel("Mean Test F1 Score", color='black')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Graph 2: Normalized distributions for F1 scores with max_iter 100 and 200
+f1_scores_100 = results_df[results_df["param_max_iter"] == 100]["mean_test_score"]
+f1_scores_200 = results_df[results_df["param_max_iter"] == 200]["mean_test_score"]
+
+# Calculate means and standard deviations for each distribution
+mean_100, std_100 = f1_scores_100.mean(), f1_scores_100.std()
+mean_200, std_200 = f1_scores_200.mean(), f1_scores_200.std()
+
+# Generate x values for the curves
+x = np.linspace(min(f1_scores_100.min(), f1_scores_200.min()),
+                max(f1_scores_100.max(), f1_scores_200.max()), 500)
+
+# Plot the distributions
+plt.figure(figsize=(10, 6))
+plt.plot(x, norm.pdf(x, mean_100, std_100), label='Max Iterations: 100', color='red')
+plt.plot(x, norm.pdf(x, mean_200, std_200), label='Max Iterations: 200', color='blue')
+plt.title("Normalized Distributions of F1 Scores", color='black')
+plt.xlabel("F1 Score", color='black')
+plt.ylabel("Density", color='black')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
